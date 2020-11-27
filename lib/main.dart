@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Merlin Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -114,6 +115,7 @@ class _splash_screenState extends State<splash_screen> {
 }
 
 MaterialApp registerScreen = new MaterialApp(
+  debugShowCheckedModeBanner: false,
   theme: ThemeData(primaryColor: Colors.blue[900]),
   routes: {
     '/': (context) => home_screen(),
@@ -121,6 +123,7 @@ MaterialApp registerScreen = new MaterialApp(
 );
 
 MaterialApp mainScreen = new MaterialApp(
+  debugShowCheckedModeBanner: false,
   theme: ThemeData(primaryColor: Colors.blue[900]),
   routes: {
     '/': (context) => mainPage(),

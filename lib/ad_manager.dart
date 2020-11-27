@@ -3,7 +3,7 @@ import 'dart:io';
 class AdManager {
   static String get appId {
     if (Platform.isAndroid) {
-      return "ca-app-pub-7232818117062807~4954258294";
+      return "ca-app-pub-7232818117062807~4082355280";
     } else if (Platform.isIOS) {
       return "<YOUR_IOS_ADMOB_APP_ID>";
     } else {
@@ -13,7 +13,7 @@ class AdManager {
 
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return "ca-app-pub-7232818117062807/4040809480";
+      return "ca-app-pub-7232818117062807/2357715232";
     } else if (Platform.isIOS) {
       return "<YOUR_IOS_BANNER_AD_UNIT_ID>";
     } else {

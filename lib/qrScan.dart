@@ -22,18 +22,18 @@ class qr_Scan extends StatefulWidget {
 class _qr_ScanState extends State<qr_Scan> {
   @override
   void initState() {
-    MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
-      nonPersonalizedAds: true,
-      testDevices: <String>["A2F50D4E1787101D621A9CCE48639DE3"],
-    );
-
-    // _bannerAd = BannerAd(
-    //   adUnitId: AdManager.bannerAdUnitId,
-    //   size: AdSize.smartBanner,
+    // MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    //   nonPersonalizedAds: true,
+    //   testDevices: <String>["A2F50D4E1787101D621A9CCE48639DE3"],
     // );
 
-    // //TODO: Load a Banner Ad
-    // _loadBannerAd();
+    _bannerAd = BannerAd(
+      adUnitId: AdManager.bannerAdUnitId,
+      size: AdSize.smartBanner,
+    );
+
+    //  TODO: Load a Banner Ad
+    _loadBannerAd();
   }
 
   BannerAd _bannerAd;
@@ -73,16 +73,11 @@ class _qr_ScanState extends State<qr_Scan> {
       qrCodeResult.replaceAll('Result:', '');
       qrJSON = json.decode(qrCodeResult);
       print(qrJSON);
-      success = Image.asset('assets/success.gif');
       // if( qrCodeResult['expiryDate'])
-      print(qrJSON['expiryDate']['year']);
-      if (DateTime(
-              qrJSON['expiryDate']['year'],
-              qrJSON['expiryDate']['month'],
-              qrJSON['expiryDate']['date'],
-              qrJSON['expiryDate']['hour'],
-              qrJSON['expiryDate']['minute'])
-          .isBefore(DateTime.now())) {
+      //print(qrJSON['expiryDate']['year']);
+      String dateConversion = qrJSON['expiryDateTime'];
+
+      if (DateTime.parse(dateConversion).isBefore(DateTime.now())) {
         Fluttertoast.showToast(
             msg:
                 "QR code has expired, please ask your teacher to reissue new QR code",
@@ -95,19 +90,22 @@ class _qr_ScanState extends State<qr_Scan> {
         expiredorNot = true;
       } else {
         playAudio();
+        success = Image.asset('assets/success.gif');
         getDatabase().then((value) {
+          print('into getDatabase()');
           sendData(value, qrJSON).then((value) {
             print('Network Request Response');
-            print(value.headers);
+            print(value.body);
             if (value.statusCode == 200) {
-              Fluttertoast.showToast(
-                  msg: "Attendance Marked",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 3,
-                  backgroundColor: Colors.grey,
-                  textColor: Colors.black,
-                  fontSize: 16.0);
+              // Fluttertoast.showToast(
+              //     msg: "Connection Established ",
+              //     toastLength: Toast.LENGTH_SHORT,
+              //     gravity: ToastGravity.BOTTOM,
+              //     timeInSecForIosWeb: 3,
+              //     backgroundColor: Colors.grey,
+              //     textColor: Colors.black,
+              //     fontSize: 16.0);
+              print('Status code 200');
             } else {
               Fluttertoast.showToast(
                   msg: "Upload Error",
@@ -134,24 +132,54 @@ class _qr_ScanState extends State<qr_Scan> {
 
   Future<http.Response> sendData(
       Map<String, dynamic> input, Map<String, dynamic> qrJSON) {
+    String date = qrJSON['expiryDateTime'];
+    DateTime jsonDate = DateTime.parse(date);
+    //"2020-11-05 12:12:12"
+    String outputDate = jsonDate.year.toString() +
+        '-' +
+        jsonDate.month.toString() +
+        '-' +
+        jsonDate.day.toString() +
+        ' ' +
+        jsonDate.hour.toString() +
+        ':' +
+        jsonDate.minute.toString() +
+        ':' +
+        jsonDate.second.toString();
+
+    print(jsonEncode(<String, Object>{
+      "subjectId": qrJSON['subjectId'],
+      'studentName': input['student_name'],
+      'studentEmail': input['email'],
+      'mobileNumber': input['mobile'],
+      'latitude': globals.lattitude,
+      'longitude': globals.longitude,
+      'year': input['year'],
+      "department": input['department'],
+      "division": input['division'],
+      "rollNumber": input['roll_number'],
+      "scanTime": DateTime.now().toString(),
+      'expiryDateTime': outputDate,
+    }));
+
     return http.post(
-      'http://vancotech.com/attendance/laxman-test/post-scan.php',
+      'http://vancotech.com/attendance/api/post-scan.php',
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, Object>{
+        "subjectId": qrJSON['subjectId'],
         'studentName': input['student_name'],
         'studentEmail': input['email'],
         'mobileNumber': input['mobile'],
         'latitude': globals.lattitude,
         'longitude': globals.longitude,
         'year': input['year'],
-        'expiryDateTime': new DateTime(
-            qrJSON['expiryDate']['year'],
-            qrJSON['expiryDate']['month'],
-            qrJSON['expiryDate']['date'],
-            qrJSON['expiryDate']['hour'],
-            qrJSON['expiryDate']['minute'])
+        "department": input['department'],
+        "division": input['division'],
+        "rollNumber": input['roll_number'],
+        "scanTime": DateTime.now().toString(),
+        'expiryDateTime': outputDate,
       }),
     );
   }
@@ -173,11 +201,12 @@ class _qr_ScanState extends State<qr_Scan> {
     } else if (expiredorNot == false) {
       return Text(
           'Your attendance for ' +
-              qrJSON['subjects'].toString() +
-              ', lecture from ' +
-              qrJSON['from'].toString() +
-              ' to ' +
-              qrJSON['to'].toString() +
+              qrJSON['subjectName'].toString() +
+              ', lecture' +
+              // ' from ' +
+              // qrJSON['from'].toString() +
+              // ' to ' +
+              // qrJSON['to'].toString() +
               ' is marked successfully',
           style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal));
     } else if (expiredorNot == true) {

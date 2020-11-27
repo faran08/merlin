@@ -16,18 +16,18 @@ class mainPage extends StatefulWidget {
 class _mainPageState extends State<mainPage> {
   @override
   void initState() {
-    MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
-      nonPersonalizedAds: true,
-      testDevices: <String>["A2F50D4E1787101D621A9CCE48639DE3"],
-    );
-
-    // _bannerAd = BannerAd(
-    //   adUnitId: AdManager.bannerAdUnitId,
-    //   size: AdSize.smartBanner,
+    // MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    //   nonPersonalizedAds: true,
+    //   testDevices: <String>["A2F50D4E1787101D621A9CCE48639DE3"],
     // );
 
-    // //TODO: Load a Banner Ad
-    // _loadBannerAd();
+    _bannerAd = BannerAd(
+      adUnitId: AdManager.bannerAdUnitId,
+      size: AdSize.smartBanner,
+    );
+
+    //TODO: Load a Banner Ad
+    _loadBannerAd();
   }
 
   BannerAd _bannerAd;
