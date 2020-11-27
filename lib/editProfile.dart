@@ -1,8 +1,13 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 
 import 'database.dart';
 import 'mainPage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+const pickerData = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
 
 class editProfile extends StatefulWidget {
   @override
@@ -10,33 +15,74 @@ class editProfile extends StatefulWidget {
 }
 
 class _editProfileState extends State<editProfile> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController your_Name = new TextEditingController();
   TextEditingController college_name = new TextEditingController();
   TextEditingController email = new TextEditingController();
   TextEditingController mobile_no = new TextEditingController();
   TextEditingController department = new TextEditingController();
-  TextEditingController year_picker = new TextEditingController();
+  //TextEditingController year_picker = new TextEditingController();
+  String year_picker = "Select Year";
   TextEditingController division = new TextEditingController();
   TextEditingController roll_no = new TextEditingController();
   TextEditingController colleg_no = new TextEditingController();
   bool updateOnce = false;
+
+  showPicker(BuildContext context) {
+    Picker picker = Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: pickerData),
+        changeToFirst: false,
+        textAlign: TextAlign.left,
+        textStyle: const TextStyle(color: Colors.blue),
+        selectedTextStyle: TextStyle(color: Colors.red),
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List value) {
+          print(value.toString());
+          print(picker.getSelectedValues());
+          setState(() {
+            year_picker = picker.getSelectedValues()[0];
+          });
+        });
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  TextField getTextField(String text, TextEditingController controller) {
+    return TextField(
+      decoration: InputDecoration(
+        labelText: text,
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blue[900]),
+        ),
+      ),
+      controller: controller,
+      cursorColor: Colors.blue[900],
+      selectionWidthStyle: BoxWidthStyle.tight,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (updateOnce == false) {
       DBProvider.db.getData(1).then((value) {
-        your_Name.text = value['student_name'];
-        college_name.text = value['college_name'];
-        email.text = value['email'];
-        mobile_no.text = value['mobile'];
-        department.text = value['department'];
-        year_picker.text = value['year'];
-        division.text = value['division'];
-        roll_no.text = value['roll_number'];
-        colleg_no.text = value['college_number'];
+        setState(() {
+          your_Name.text = value['student_name'];
+          college_name.text = value['college_name'];
+          email.text = value['email'];
+          mobile_no.text = value['mobile'];
+          department.text = value['department'];
+          year_picker = value['year'];
+          division.text = value['division'];
+          roll_no.text = value['roll_number'];
+          colleg_no.text = value['college_number'];
+        });
       });
       updateOnce = true;
     }
     return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.black),
@@ -59,45 +105,33 @@ class _editProfileState extends State<editProfile> {
               Flexible(
                   child: ListView(
                 children: [
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: 'Student Name',
-                        labelStyle: TextStyle(color: Colors.blue[900])),
-                    controller: your_Name,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'College Name'),
-                    controller: college_name,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Email Address'),
-                    controller: email,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Mobile Number'),
-                    controller: mobile_no,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Department'),
-                    controller: department,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Year'),
-                    controller: year_picker,
-                  ),
-                  TextField(
-                      decoration: InputDecoration(labelText: 'Division'),
-                      controller: division),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Roll Number'),
-                    controller: roll_no,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'College Number'),
-                    controller: colleg_no,
-                  ),
+                  getTextField('Student Name', your_Name),
+                  getTextField('College Name', college_name),
+                  getTextField('Email Address', email),
+                  getTextField('Mobile Number', mobile_no),
+                  getTextField('Department', department),
                   Padding(
                     padding: EdgeInsets.only(top: 10),
+                    child: Text(
+                      'Select Year',
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                  ),
+                  FlatButton(
+                      onPressed: () {
+                        showPicker(context);
+                      },
+                      child: Text(year_picker),
+                      textColor: Colors.black,
+                      shape: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      padding: EdgeInsets.all(0.0)),
+                  getTextField('Division', division),
+                  getTextField('Roll Number', roll_no),
+                  getTextField('College Number', colleg_no),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10, bottom: 50),
                     child: FlatButton(
                         onPressed: () {
                           Map<String, dynamic> modifyData = {
@@ -106,7 +140,7 @@ class _editProfileState extends State<editProfile> {
                             'email': email.text,
                             'mobile': mobile_no.text,
                             'department': department.text,
-                            'year': year_picker.text,
+                            'year': year_picker,
                             'division': division.text,
                             'roll_number': roll_no.text,
                             'college_number': colleg_no.text
@@ -124,7 +158,7 @@ class _editProfileState extends State<editProfile> {
                         },
                         child: Text('Save Details'),
                         textColor: Colors.white,
-                        color: Colors.blue,
+                        color: Colors.blue[900],
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
                         padding: EdgeInsets.all(0.0)),

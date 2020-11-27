@@ -1,8 +1,12 @@
+import 'package:barcode_scan/gen/protos/protos.pb.dart';
 import 'package:flutter/material.dart';
 import 'package:merlin/editProfile.dart';
 import 'package:merlin/qrScan.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:merlin/database.dart';
+import 'package:firebase_admob/firebase_admob.dart';
+
+import 'ad_manager.dart';
 
 class mainPage extends StatefulWidget {
   @override
@@ -10,6 +14,43 @@ class mainPage extends StatefulWidget {
 }
 
 class _mainPageState extends State<mainPage> {
+  @override
+  void initState() {
+    MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+      nonPersonalizedAds: true,
+      testDevices: <String>["A2F50D4E1787101D621A9CCE48639DE3"],
+    );
+
+    // _bannerAd = BannerAd(
+    //   adUnitId: AdManager.bannerAdUnitId,
+    //   size: AdSize.smartBanner,
+    // );
+
+    // //TODO: Load a Banner Ad
+    // _loadBannerAd();
+  }
+
+  BannerAd _bannerAd;
+
+  Future<void> _initAdMob() {
+    // TODO: Initialize AdMob SDK
+    return FirebaseAdMob.instance.initialize(
+      appId: AdManager.appId,
+    );
+  }
+
+  void _loadBannerAd() {
+    _bannerAd
+      ..load()
+      ..show(anchorType: AnchorType.bottom);
+  }
+
+  void dispose() {
+    // TODO: Dispose BannerAd object
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     DBProvider.db.getData(1).then((value) => print(value));
@@ -57,13 +98,14 @@ class _mainPageState extends State<mainPage> {
           const Divider(
             height: 5,
             thickness: 1,
-            indent: 20,
-            endIndent: 20,
+            indent: 0,
+            endIndent: 0,
             color: Colors.grey,
           ),
           GestureDetector(
             onTap: () {
-              Navigator.push(
+              dispose();
+              Navigator.pushReplacement(
                   context, MaterialPageRoute(builder: (context) => qr_Scan()));
             },
             child: Row(
@@ -78,7 +120,7 @@ class _mainPageState extends State<mainPage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 20, top: 20),
+                  padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
                   child: Text(
                     'QR Code',
                     style: TextStyle(fontSize: 18, color: Colors.black),
@@ -86,6 +128,13 @@ class _mainPageState extends State<mainPage> {
                 )
               ],
             ),
+          ),
+          const Divider(
+            height: 5,
+            thickness: 1,
+            indent: 0,
+            endIndent: 0,
+            color: Colors.grey,
           )
         ],
       ),
