@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>418046422739-sjf5rsrgg7qd8ud3pj9p5339bkt24rne.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.418046422739-sjf5rsrgg7qd8ud3pj9p5339bkt24rne</string>
+	<key>API_KEY</key>
+	<string>AIzaSyADkYyz2Sf4XMj3MGueYFOSIelTE-56dsM</string>
+	<key>GCM_SENDER_ID</key>
+	<string>418046422739</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.vancotech.merlin</string>
+	<key>PROJECT_ID</key>
+	<string>merlin-d283f</string>
+	<key>STORAGE_BUCKET</key>
+	<string>merlin-d283f.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:418046422739:ios:8babbceec7f4c8613dee26</string>
+	<key>DATABASE_URL</key>
+	<string>https://merlin-d283f.firebaseio.com</string>
+</dict>
+</plist>
