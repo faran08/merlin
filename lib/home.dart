@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:merlin/database.dart';
 import 'package:merlin/mainPage.dart';
@@ -7,6 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_picker/flutter_picker.dart';
+
+const pickerData = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
 
 class home_screen extends StatefulWidget {
   @override
@@ -14,12 +19,15 @@ class home_screen extends StatefulWidget {
 }
 
 class _home_screenState extends State<home_screen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   TextEditingController your_Name = new TextEditingController();
   TextEditingController college_name = new TextEditingController();
   TextEditingController email = new TextEditingController();
   TextEditingController mobile_no = new TextEditingController();
   TextEditingController department = new TextEditingController();
-  TextEditingController year_picker = new TextEditingController();
+  //TextEditingController year_picker = new TextEditingController();
+  String year_picker = 'Select Year';
   TextEditingController division = new TextEditingController();
   TextEditingController roll_no = new TextEditingController();
   TextEditingController colleg_no = new TextEditingController();
@@ -30,10 +38,52 @@ class _home_screenState extends State<home_screen> {
     prefs.setBool('oneTimeUser', true);
   }
 
+  showPicker(BuildContext context) {
+    Picker picker = Picker(
+        adapter: PickerDataAdapter<String>(pickerdata: pickerData),
+        changeToFirst: false,
+        textAlign: TextAlign.left,
+        textStyle: const TextStyle(color: Colors.blue),
+        selectedTextStyle: TextStyle(color: Colors.red),
+        columnPadding: const EdgeInsets.all(8.0),
+        onConfirm: (Picker picker, List value) {
+          print(value.toString());
+          print(picker.getSelectedValues());
+          setState(() {
+            year_picker = picker.getSelectedValues()[0];
+          });
+        });
+    picker.show(_scaffoldKey.currentState);
+  }
+
+  TextField getTextField(String text, TextEditingController controller) {
+    return TextField(
+      decoration: InputDecoration(
+        labelText: text,
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blue[900]),
+        ),
+      ),
+      controller: controller,
+      cursorColor: Colors.blue[900],
+      selectionWidthStyle: BoxWidthStyle.tight,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     //WidgetsFlutterBinding.ensureInitialized();
+    // if (!year_picker.text.contains('First Year') ||
+    //     !year_picker.text.contains('Second Year') ||
+    //     !year_picker.text.contains('Third Year') ||
+    //     !year_picker.text.contains('Fourth Year')) {
+    //   year_picker.text = '';
+    // }
     return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           title: Image.asset(
             'assets/merlin.png',
@@ -52,43 +102,31 @@ class _home_screenState extends State<home_screen> {
               Flexible(
                   child: ListView(
                 children: [
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: 'Student Name',
-                        labelStyle: TextStyle(color: Colors.blue[900])),
-                    controller: your_Name,
+                  getTextField('Student Name', your_Name),
+                  getTextField('College Name', college_name),
+                  getTextField('Email Address', email),
+                  getTextField('Mobile Number', mobile_no),
+                  getTextField('Department', department),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Text(
+                      'Select Year',
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
                   ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'College Name'),
-                    controller: college_name,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Email Address'),
-                    controller: email,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Mobile Number'),
-                    controller: mobile_no,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Department'),
-                    controller: department,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Year'),
-                    controller: year_picker,
-                  ),
-                  TextField(
-                      decoration: InputDecoration(labelText: 'Division'),
-                      controller: division),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Roll Number'),
-                    controller: roll_no,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'College Number'),
-                    controller: colleg_no,
-                  ),
+                  FlatButton(
+                      onPressed: () {
+                        showPicker(context);
+                      },
+                      child: Text(year_picker),
+                      textColor: Colors.black,
+                      shape: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      padding: EdgeInsets.all(0.0)),
+                  getTextField('Division', division),
+                  getTextField('Roll Number', roll_no),
+                  getTextField('College Number', colleg_no),
                   Padding(
                     padding: EdgeInsets.only(top: 10),
                     child: FlatButton(
@@ -99,7 +137,7 @@ class _home_screenState extends State<home_screen> {
                             'email': email.text,
                             'mobile': mobile_no.text,
                             'department': department.text,
-                            'year': year_picker.text,
+                            'year': year_picker,
                             'division': division.text,
                             'roll_number': roll_no.text,
                             'college_number': colleg_no.text
@@ -114,7 +152,7 @@ class _home_screenState extends State<home_screen> {
                         },
                         child: Text('Save Details'),
                         textColor: Colors.white,
-                        color: Colors.blue,
+                        color: Colors.blue[900],
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
                         padding: EdgeInsets.all(0.0)),

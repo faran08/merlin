@@ -28,6 +28,10 @@ dependencies:
   path_provider: ^1.6.22
   fluttertoast: ^7.0.2
   just_audio: ^0.5.5
+  http:
+  flutter_picker: ^1.1.5
+  firebase_admob: ^0.10.1
+  firebase_core: ^0.5.1
 
   flutter:
     sdk: flutter

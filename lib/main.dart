@@ -3,6 +3,8 @@ import 'package:merlin/mainPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:merlin/home.dart';
+import 'globals.dart' as globals;
+import 'package:location/location.dart';
 
 void main() {
   runApp(MyApp());
@@ -46,18 +48,46 @@ class _splash_screenState extends State<splash_screen> {
     return prefs.getBool('oneTimeUser');
   }
 
+  Future<void> getLoc() async {
+    Location location = new Location();
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _locationData = await location.getLocation();
+    globals.lattitude = _locationData.latitude.toString();
+    globals.longitude = _locationData.longitude.toString();
+    print(_locationData.latitude.toString());
+    print(_locationData.longitude.toString());
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
     bool condition;
     _getOnetimeUse().then((value) {
       condition = value;
     });
+    getLoc();
     Timer(Duration(seconds: 2), () {
       Navigator.pop(context);
-
       if (condition == true) {
         MaterialPageRoute main =
             new MaterialPageRoute(builder: (context) => mainScreen);
